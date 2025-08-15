@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+
+// The main entry point for the application.
+void main() {
+  runApp(const MoodTrackerApp());
+}
+
+// The root widget of the application, which sets up the theme.
+class MoodTrackerApp extends StatelessWidget {
+  const MoodTrackerApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mood Tracker',
+      theme: ThemeData(
+        useMaterial3: true,
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: const MoodTrackerPage(),
+    );
+  }
+}
+
+// The main screen of the app, which manages the counter's state.
+class MoodTrackerPage extends StatefulWidget {
+  const MoodTrackerPage({super.key});
+
+  @override
+  State<MoodTrackerPage> createState() => _MoodTrackerPageState();
+}
+
+// The state class for MoodTrackerPage, holding the counter and logic.
+class _MoodTrackerPageState extends State<MoodTrackerPage> {
+  int _score = 0;
+
+  // Function to get the background color based on the score.
+  Color getBackgroundColor() {
+    if (_score > 5) return Colors.orange[100]!;
+    if (_score < 0) return Colors.blueGrey[100]!;
+    return Colors.blue[100]!;
+  }
+
+  // Function to get the emoji based on the score.
+  String getEmoji() {
+    if (_score > 5) return '😀';
+    if (_score < 0) return '😩';
+    return '😐';
+  }
+
+  // Function to get the contextual message based on the score.
+  String getMessage() {
+    if (_score > 5) return 'Feeling great!';
+    if (_score < 0) return 'Needs some work...';
+    return 'Neutral mood';
+  }
+
+  // Increments the score and triggers a UI rebuild.
+  void _incrementScore() {
+    setState(() {
+      _score++;
+    });
+  }
+
+  // Decrements the score and triggers a UI rebuild.
+  void _decrementScore() {
+    setState(() {
+      _score--;
+    });
+  }
+
+  // Resets the score and shows a SnackBar.
+  void _resetScore() {
+    setState(() {
+      _score = 0;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Mood has been reset to neutral.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mood Tracker'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: _decrementScore,
+          ),
+        ],
+      ),
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        color: getBackgroundColor(),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // The main display for the emoji and score.
+              Text(getEmoji(), style: const TextStyle(fontSize: 100)),
+              const SizedBox(height: 10),
+              Text(
+                getMessage(),
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$_score',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 50),
+              // The reset button.
+              ElevatedButton.icon(
+                onPressed: _resetScore,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reset Mood'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.blue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      // The primary button to increment the score.
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _incrementScore,
+        label: const Text('Add Positive Vibe'),
+        icon: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
